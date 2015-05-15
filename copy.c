@@ -9,24 +9,55 @@ void main() {
 	void *rdx = NULL;
 	//istart = (void*)malloc(0x1b);
 
+	/*
+	 * Store rdx so that it's not killed
+	 * when we invoke other functions.
+	 */
 	asm("mov %%rdx, %0\n"
 	    : "=r" (rdx)
 			:
 			: "rdx");
 
+	/*
+	 * Using commands from Makefile, we know that
+	 * there is going to be some code at 0x602000
+	 * that will do "something" and eventually
+	 * transfer control to the entry point of the
+	 * original program.
+	 *
+	 * This memcpy() is a nop, but we do it just to
+	 * show that we can call functions here.
+	 *
+	 * Eventually, we are just going to jump
+	 * to that code and hope that it does the right
+	 * thing.
+	 */
 	memcpy(istart, (void*)0x602000, 0x1b);
 
+	/*
+	 * Restore rdx from where we stored it.
+	 */
 	asm("mov %0, %%rdx\n"
 	    :
 			: "r" (rdx)
 			: "rdx");
 
+	/*
+	 * Reload rsp with its address when this
+	 * function began. In essence, we are
+	 * popping the stack from this function.
+	 * We want the stack back because it contains
+	 * argv.
+	 */
 	asm("mov %%rbp, %%rsp\n"
 	    "add $8, %%rsp\n"
 	    :
 			:
 			:);
 
+	/*
+	 * And, jump.
+	 */
 	asm("mov %1, %0\n"
 	    "jmp *%1\n"
 			: "=r" (ostart)
