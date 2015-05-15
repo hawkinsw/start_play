@@ -32,7 +32,13 @@ copy: copy.c Makefile
 	copy.o copy.text.o
 
 start: start.c Makefile
+	@echo -n
+# Simply compile an object file of start.c
 	gcc -c start.c
+# Just get the object code for the .text section
+# out of start.o. This places some restrictions on
+# what that code can do, but this is just a simple
+# example so it's okay.
 	objcopy -O binary --only-section=".text" start.o start.text.o
 
 main: main.c Makefile
