@@ -1,4 +1,9 @@
 void main() {
-	asm("mov $0x400440, %rax\n"
-	    "jmp *%rax");
+	asm("mov %%rbp, %%rsp\n"
+	    "add $8, %%rsp\n"
+	    "mov $0x400490, %%rax\n"
+	    "jmp *%%rax\n"
+	    :
+	    :
+	    :);
 }
