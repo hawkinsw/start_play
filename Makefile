@@ -4,16 +4,16 @@ all: copy start main Makefile
 # on main.
 	cp main c
 # Put start in to jump to the actual start spot
-	objcopy --add-section jumpstart=start.small.o --set-section-flags jumpstart=code,alloc c --change-section-address jumpstart=0x0602000
+	objcopy --add-section jumpstart=start.text.o --set-section-flags jumpstart=code,alloc c --change-section-address jumpstart=0x0602000
 # Put copy in as start segment.
-	objcopy --add-section newstart=copy.small.o --set-section-flags newstart=code,alloc c --change-section-address newstart=0x0604000 --set-start=0x0604cfe
+	objcopy --add-section newstart=copy.text.o --set-section-flags newstart=code,alloc c --change-section-address newstart=0x0604000 --set-start=0x0604cfe
 # Even though both sections are in, we have to add them
 # as segments. We use a special strata-specific tool
 # for that.
 	$(STRATAFIER)/add_strata_segment64 --segment_name jumpstart c c.addseg.1
 	$(STRATAFIER)/add_strata_segment64 --segment_name newstart c.addseg.1 c.addseg
 # take away the temporary files.
-	rm -f c.addseg.1
+	rm -f c c.addseg.1
 
 copy: copy.c Makefile
 	@echo -n
@@ -29,12 +29,13 @@ copy: copy.c Makefile
 # out of copy.o. This places some restrictions on
 # what that code can do, but it's okay.
 	objcopy -O binary --only-section=".text" \
-	copy.o copy.small.o
+	copy.o copy.text.o
 
 start: start.c Makefile
 	gcc -c start.c
-	objcopy -O binary --only-section=".text" start.o start.small.o
+	objcopy -O binary --only-section=".text" start.o start.text.o
+
 main: main.c Makefile
 	gcc -o main main.c
 clean:
-	rm -f main c start.o start.small.o copy.small.o copy.o *addseg*
+	rm -f main c start.o start.text.o copy.text.o copy.o *addseg*

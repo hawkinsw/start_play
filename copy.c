@@ -7,7 +7,6 @@ void main() {
 	void *istart = (void*)0x602000;
 	void *ostart = NULL;
 	void *rdx = NULL;
-	//istart = (void*)malloc(0x1b);
 
 	/*
 	 * Store rdx so that it's not killed
